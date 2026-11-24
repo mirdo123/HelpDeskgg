@@ -25,12 +25,19 @@
                 <TextBlock Text="Система обработки заявок" FontSize="14" Opacity="0.7" Margin="0,4,0,0"/>
             </StackPanel>
 
-            <TextBlock x:Name="CurrentUserTextBlock"
-                       Grid.Column="1"
-                       Text="Пользователь: admin"
-                       FontSize="14"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <TextBlock x:Name="CurrentUserTextBlock"
+                           Text="Пользователь: не определён"
+                           FontSize="14"
+                           VerticalAlignment="Center"
+                           Margin="0,0,15,0"/>
+                <Button x:Name="LogoutButton"
+                        Content="Выйти"
+                        Width="90"
+                        Height="32"
+                        FontSize="14"
+                        Click="LogoutButton_Click"/>
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,0,0,15">

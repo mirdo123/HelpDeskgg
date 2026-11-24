@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HelpDesk.Helpers;
+using HelpDesk.Models;
+using HelpDesk.Services;
+using System;
+using System.Data.SqlClient;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace HelpDesk.Views
 {
@@ -23,44 +16,52 @@ namespace HelpDesk.Views
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(LoginTextBox.Text))
-            {
-                MessageBox.Show(
-                    "Введите логин.",
-                    "Проверка данных",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(PasswordInput.Password))
-            {
-                MessageBox.Show(
-                    "Введите пароль.",
-                    "Проверка данных",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return;
-            }
-
-
-            string login = LoginTextBox.Text;
+            string login = LoginTextBox.Text.Trim();
             string password = PasswordInput.Password;
 
-            if (login == "admin" && password == "12345")
+            if (string.IsNullOrWhiteSpace(login))
             {
+                MessageBox.Show("Введите логин.");
+                LoginTextBox.Focus();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                MessageBox.Show("Введите пароль.");
+                PasswordInput.Focus();
+                return;
+            }
+
+            try
+            {
+                AuthService authService = new AuthService();
+                User user = authService.Authenticate(login, password);
+
+                if (user == null)
+                {
+                    MessageBox.Show(
+                        "Неверный логин или пароль, либо учётная запись отключена.",
+                        "Авторизация",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    PasswordInput.Clear();
+                    PasswordInput.Focus();
+                    return;
+                }
+
+                UserSession.Start(user);
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.Show();
-                this.Close();
+                Close();
             }
-            else
+            catch (SqlException ex)
             {
                 MessageBox.Show(
-                    "Неверный логин или пароль.",
-                    "Ошибка авторизации",
+                    "Не удалось обратиться к базе данных:\n" + ex.Message,
+                    "Ошибка SQL Server",
                     MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
+                    MessageBoxImage.Error);
             }
         }
     }
